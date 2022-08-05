@@ -7,8 +7,9 @@ from kivy.uix.button import Button
 from random import randint
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
-
+from kivy.uix.label import Label
 from board_logic import BoardLogic
+from kivy.uix.screenmanager import Screen,ScreenManager
 
 Window.clearcolor = (.5,.5,.5,0.7)
 board_size = 7
@@ -35,6 +36,7 @@ class BigGrid(GridLayout):
         for i in range(size):
             for j in range(size):
                 color = TwoDArray[i][j]
+                color = randint(3,4)
                 # for each and every button below, we need to find a way to let it send back the column & row number
                 if color < 3 or color > 10 :
                     b = Button()
@@ -43,19 +45,46 @@ class BigGrid(GridLayout):
                 self.add_widget(b)
 
 # Where the score is displayed
-class ScoreBoard:
-    pass
-
+class Scoreboard(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = "vertical"
+        self.size_hint = (0.3, 0.15)
+        self.pos_hint_x = 0.8
+        self.pos_hint_y = 0.8
+        runScore = BoxLayout()
+        runScore.orientation = "vertical"
+        scoretext = Label(text = "Score:")
+        runScore.add_widget(scoretext)
+        actualScore = Label(text = "{}".format(app.score))
+        runScore.add_widget(actualScore)
+        self.add_widget(runScore)
+        highScore = BoxLayout()
+        highScore.orientation = "vertical"
+        highscoretext = Label(text="Highscore:")
+        highScore.add_widget(highscoretext)
+        # add high score to format when json/yml file is written
+        bestScore = Label(text="1".format())
+        highScore.add_widget(bestScore)
+        self.add_widget(highScore)
 # display three balls for player to place
 # once selected and placed, the correspong spot will be disabled. 
-class NextRoundBallPicker:
+class BallPicker:
     pass
 
 # once clicked, the game will be reset, a new game starts
 class RestartButton:
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
+class PlayingScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
+        # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Button, etc
+        print("hi")
+        self.add_widget(BigGrid(board_size, app.boardData.GetBoardData()))
+        self.add_widget(Scoreboard())
 
 class GameApp(App):
     def __init__(self,**kwargs):
@@ -66,9 +95,7 @@ class GameApp(App):
         self.score = 0
 
     def build(self):
-        # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Buttone, etc
-        return BigGrid(board_size, self.boardData.GetBoardData())
-
+        return PlayingScreen()
 
 
 app = GameApp()
