@@ -50,8 +50,7 @@ class Scoreboard(BoxLayout):
         super().__init__(**kwargs)
         self.orientation = "vertical"
         self.size_hint = (0.3, 0.15)
-        self.pos_hint_x = 0.8
-        self.pos_hint_y = 0.8
+        self.pos_hint = {"top": 0.8, "right": 0.8}
         runScore = BoxLayout()
         runScore.orientation = "vertical"
         scoretext = Label(text = "Score:")
@@ -69,13 +68,17 @@ class Scoreboard(BoxLayout):
         self.add_widget(highScore)
 # display three balls for player to place
 # once selected and placed, the correspong spot will be disabled. 
-class BallPicker:
+class BallPicker(BoxLayout):
     pass
 
 # once clicked, the game will be reset, a new game starts
-class RestartButton:
+class MenuButton(Button):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.background_normal_color = (0,0,0,1)
+        self.size_hint = (0.05,0.05)
+        self.pos_hint = {'top': 1, "right": 1}
+        self.background_normal = "pauseButton.png"
 
 class PlayingScreen(Screen):
     def __init__(self, **kwargs):
@@ -85,6 +88,7 @@ class PlayingScreen(Screen):
         print("hi")
         self.add_widget(BigGrid(board_size, app.boardData.GetBoardData()))
         self.add_widget(Scoreboard())
+        self.add_widget(MenuButton())
 
 class GameApp(App):
     def __init__(self,**kwargs):
