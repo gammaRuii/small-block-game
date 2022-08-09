@@ -87,19 +87,18 @@ class MenuButton(Button):
         self.pos_hint = {'top': 1, "right": 1}
         self.background_normal = "pauseButton.png"
 
-class PlayingScreen(BackgroundColorBehavior):
+class PlayingScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Button, etc
         print("hi")
-        self.md_bg_color = (0.5,0.5,0.5,0.7)
         self.add_widget(BigGrid(board_size, app.boardData.GetBoardData()))
         self.add_widget(Scoreboard())
         self.add_widget(MenuButton())
         self.add_widget(BallPicker())
 
-class GameApp(MDApp):
+class GameApp(App):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.boardData = BoardLogic(board_size)
