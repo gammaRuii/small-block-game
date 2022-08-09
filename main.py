@@ -10,6 +10,9 @@ from kivy.core.window import Window
 from kivy.uix.label import Label
 from board_logic import BoardLogic
 from kivy.uix.screenmanager import Screen,ScreenManager
+from kivymd.app import MDApp
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.behaviors.backgroundcolor_behavior import BackgroundColorBehavior
 
 Window.clearcolor = (.5,.5,.5,0.7)
 board_size = 7
@@ -69,18 +72,22 @@ class Scoreboard(BoxLayout):
 # display three balls for player to place
 # once selected and placed, the correspong spot will be disabled. 
 class BallPicker(BoxLayout):
-    pass
-
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        for i in range(3):
+            ball_color = randint(3,10)
+            ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color))
+            self.add_widget(ball)
 # once clicked, the game will be reset, a new game starts
 class MenuButton(Button):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.background_normal_color = (0,0,0,1)
+        self.background_color = (0,0,0,1)
         self.size_hint = (0.05,0.05)
         self.pos_hint = {'top': 1, "right": 1}
         self.background_normal = "pauseButton.png"
 
-class PlayingScreen(Screen):
+class PlayingScreen(BackgroundColorBehavior):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -89,8 +96,9 @@ class PlayingScreen(Screen):
         self.add_widget(BigGrid(board_size, app.boardData.GetBoardData()))
         self.add_widget(Scoreboard())
         self.add_widget(MenuButton())
+        self.add_widget(BallPicker())
 
-class GameApp(App):
+class GameApp(MDApp):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.boardData = BoardLogic(board_size)
