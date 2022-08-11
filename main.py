@@ -39,12 +39,11 @@ class BigGrid(GridLayout):
         for i in range(size):
             for j in range(size):
                 color = TwoDArray[i][j]
-                color = randint(3,4)
                 # for each and every button below, we need to find a way to let it send back the column & row number
                 if color < 3 or color > 10 :
-                    b = Button()
+                    b = Button(on_press = app.BoardPlace)
                 else :
-                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color))
+                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), on_press = app.BoardPlace)
                 self.add_widget(b)
 
 # Where the score is displayed
@@ -76,8 +75,11 @@ class BallPicker(BoxLayout):
         super().__init__(**kwargs)
         for i in range(3):
             ball_color = randint(3,10)
-            ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color))
+            ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
+            ball.id = "ballpick{}".format(i)
             self.add_widget(ball)
+        self.size_hint = (0.4,0.2)
+        self.pos_hint = {"top": 0.3, "right": 0.8}
 # once clicked, the game will be reset, a new game starts
 class MenuButton(Button):
     def __init__(self, **kwargs):
@@ -105,6 +107,17 @@ class GameApp(App):
         self.nextBallColor = 0
         self.nextBallLocation = [0, 0]
         self.score = 0
+
+    def PickerPress(self,instance):
+        app.BallPressedColor = instance.background_normal
+        app.BallPressedDown = instance.background_down
+        instance.background_normal = instance.background_down
+        placed = False
+    def BoardPlace(self,instance):
+        instance.background_normal = app.BallPressedColor
+        instance.background_down = app.BallPressedDown
+        print("p")
+        placed = True
 
     def build(self):
         return PlayingScreen()
