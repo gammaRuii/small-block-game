@@ -18,6 +18,7 @@ Window.clearcolor = (.5,.5,.5,0.7)
 board_size = 7
 default_size = 10
 
+
 ### please think what behavior each widget should have? What callbacks needs to be defined?
 ### and what data will be updated in each callback?
 
@@ -41,9 +42,10 @@ class BigGrid(GridLayout):
                 color = TwoDArray[i][j]
                 # for each and every button below, we need to find a way to let it send back the column & row number
                 if color < 3 or color > 10 :
-                    b = Button(on_press = app.BoardPlace)
+                    b = Button(on_release = app.BoardPlace)
+                    # b.bind(on_release = app.RemovePickBall)
                 else :
-                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), on_press = app.BoardPlace)
+                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), on_release = app.BoardPlace)
                 self.add_widget(b)
 
 # Where the score is displayed
@@ -73,6 +75,7 @@ class Scoreboard(BoxLayout):
 class BallPicker(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.id = "Ballpicker"
         for i in range(3):
             ball_color = randint(3,10)
             ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
@@ -95,6 +98,7 @@ class PlayingScreen(Screen):
 
         # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Button, etc
         print("hi")
+        self.id = "PlayScreen"
         self.add_widget(BigGrid(board_size, app.boardData.GetBoardData()))
         self.add_widget(Scoreboard())
         self.add_widget(MenuButton())
@@ -112,12 +116,13 @@ class GameApp(App):
         app.BallPressedColor = instance.background_normal
         app.BallPressedDown = instance.background_down
         instance.background_normal = instance.background_down
-        placed = False
+        app.ball = instance.id
     def BoardPlace(self,instance):
         instance.background_normal = app.BallPressedColor
         instance.background_down = app.BallPressedDown
-        print("p")
-        placed = True
+    # def RemovePickBall(self,instance):
+    #     print(app.ball)
+    #     self.root.remove_widget(self.root.ids[app.ball])
 
     def build(self):
         return PlayingScreen()
