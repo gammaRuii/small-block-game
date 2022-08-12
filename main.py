@@ -18,7 +18,6 @@ Window.clearcolor = (.5,.5,.5,0.7)
 board_size = 7
 default_size = 10
 
-
 ### please think what behavior each widget should have? What callbacks needs to be defined?
 ### and what data will be updated in each callback?
 
@@ -77,7 +76,7 @@ class BallPicker(BoxLayout):
         super().__init__(**kwargs)
         self.id = "Ballpicker"
         for i in range(3):
-            ball_color = randint(3,10)
+            ball_color = randint(2,9)
             ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
             ball.id = "ballpick{}".format(i)
             self.add_widget(ball)
@@ -114,9 +113,10 @@ class GameApp(App):
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
+        app.ballColor = instance.background_normal[9]
         app.BallPressedDown = instance.background_down
         instance.background_normal = instance.background_down
-        app.ball = instance.id
+        print(app.ballColor)
     def BoardPlace(self,instance):
         instance.background_normal = app.BallPressedColor
         instance.background_down = app.BallPressedDown
