@@ -51,6 +51,12 @@ class BoardLogic:
     ## can u think of a better one?
     def ClearConnectedLines(self):
         pass
+
+    def determineColRow(self,number,dimension):
+        column = number % dimension
+        row = int((number-column)/dimension + 1)
+        return[column,row]
+
         
 
 

@@ -42,9 +42,11 @@ class BigGrid(GridLayout):
                 # for each and every button below, we need to find a way to let it send back the column & row number
                 if color < 3 or color > 10 :
                     b = Button(on_release = app.BoardPlace)
+                    b.id = (i)*board_size + j+1
                     # b.bind(on_release = app.RemovePickBall)
                 else :
                     b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), on_release = app.BoardPlace)
+                    b.id = (i) * board_size + j + 1
                 self.add_widget(b)
 
 # Where the score is displayed
@@ -96,7 +98,7 @@ class PlayingScreen(Screen):
         super().__init__(**kwargs)
 
         # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Button, etc
-        print("hi")
+        # print("hi")
         self.id = "PlayScreen"
         self.add_widget(BigGrid(board_size, app.boardData.GetBoardData()))
         self.add_widget(Scoreboard())
@@ -110,16 +112,26 @@ class GameApp(App):
         self.nextBallColor = 0
         self.nextBallLocation = [0, 0]
         self.score = 0
+        self.ballColor = 0
+        self.placing = False
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
         app.ballColor = instance.background_normal[9]
         app.BallPressedDown = instance.background_down
-        instance.background_normal = instance.background_down
+        instance.disabled = True
+        instance.background_disabled_normal = instance.background_down
         print(app.ballColor)
+
     def BoardPlace(self,instance):
-        instance.background_normal = app.BallPressedColor
-        instance.background_down = app.BallPressedDown
+        if app.ballColor != 0:
+            instance.background_normal = app.BallPressedColor
+            instance.background_down = app.BallPressedDown
+            print(instance.id)
+            print(BoardLogic.determineColRow((),instance.id,board_size))
+            app.ballColor = 0
+        else:
+            pass
     # def RemovePickBall(self,instance):
     #     print(app.ball)
     #     self.root.remove_widget(self.root.ids[app.ball])
