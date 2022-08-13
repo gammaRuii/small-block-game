@@ -151,6 +151,10 @@ class GameApp(App):
             print(BoardLogic.determineColRow((),instance.id,board_size))
             app.ballColor = 0
         else:
+            popup = Popup(title='Error',
+                content=Button(text='No ball selected!'),
+                size_hint=(None, None), size=(300, 200))
+            popup.open()
             # show some error message to user
             pass
 
