@@ -46,11 +46,11 @@ class BigGrid(GridLayout):
                 # for each and every button below, we need to find a way to let it send back the column & row number
                 if color < 3 or color > 10 :
                     b = Button(on_release = app.BoardPlace)
-                    b.id = (i)*board_size + j+1
+                    b.id = i*board_size + j
                     # b.bind(on_release = app.RemovePickBall)
                 else :
                     b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), on_release = app.BoardPlace)
-                    b.id = (i) * board_size + j + 1
+                    b.id = i * board_size + j
                 self.add_widget(b)
 
 # Where the score is displayed
@@ -151,10 +151,11 @@ class GameApp(App):
             print(BoardLogic.determineColRow((),instance.id,board_size))
             app.ballColor = 0
         else:
-            popup = Popup(title='Error',
-                content=Button(text='No ball selected!'),
-                size_hint=(None, None), size=(300, 200))
-            popup.open()
+            # popup = Popup(title='Error',
+            #     content=Button(text='No ball selected!'),
+            #     size_hint=(None, None), size=(300, 200))
+            # popup.open()
+            print(instance.id)
             # show some error message to user
             pass
 
