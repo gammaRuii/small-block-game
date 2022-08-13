@@ -19,6 +19,8 @@ class BoardLogic:
     # this function is the response to the action that the player put a ball in a given location
     # what is the logic you can think of?
     def putBallInSpot(self, col, row, ball_val):
+        self.boardData[col-1][row-1] = ball_val
+
         '''
         A possible logic flow
 

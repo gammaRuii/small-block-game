@@ -10,13 +10,15 @@ from kivy.core.window import Window
 from kivy.uix.label import Label
 from board_logic import BoardLogic
 from kivy.uix.screenmanager import Screen,ScreenManager
-from kivymd.app import MDApp
-from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.behaviors.backgroundcolor_behavior import BackgroundColorBehavior
+#from kivymd.app import MDApp
+#from kivymd.uix.menu import MDDropdownMenu
+#from kivymd.uix.behaviors.backgroundcolor_behavior import BackgroundColorBehavior
+from kivy.uix.popup import Popup
 
 Window.clearcolor = (.5,.5,.5,0.7)
 board_size = 7
 default_size = 10
+board_dimension = 800
 
 ### please think what behavior each widget should have? What callbacks needs to be defined?
 ### and what data will be updated in each callback?
@@ -25,7 +27,7 @@ class BigGrid(GridLayout):
     def __init__(self, size, TwoDArray, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (None,None)
-        self.size = (dp(800),dp(800))
+        self.size = (dp(board_dimension ),dp(board_dimension))
         if size <= 0:
             size = default_size
         self.cols = size
@@ -36,6 +38,8 @@ class BigGrid(GridLayout):
     # we need to call the function every time the board status (a new ball placed, or a new game started)
     # please make sure it can redraw 
     def draw(self, size, TwoDArray):
+        self.clear_widgets()
+        print(size, TwoDArray )
         for i in range(size):
             for j in range(size):
                 color = TwoDArray[i][j]
@@ -71,19 +75,23 @@ class Scoreboard(BoxLayout):
         bestScore = Label(text="1".format())
         highScore.add_widget(bestScore)
         self.add_widget(highScore)
+
 # display three balls for player to place
 # once selected and placed, the correspong spot will be disabled. 
 class BallPicker(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.id = "Ballpicker"
+        self.size_hint = (None, None)
+        height = int(board_dimension / board_size)
+        self.size = (dp(height*3), dp(height))
         for i in range(3):
             ball_color = randint(2,9)
-            ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
+            ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress, )
             ball.id = "ballpick{}".format(i)
             self.add_widget(ball)
-        self.size_hint = (0.4,0.2)
-        self.pos_hint = {"top": 0.3, "right": 0.8}
+        
+        self.pos_hint = {"top": 1, "right": 1}
 # once clicked, the game will be reset, a new game starts
 class MenuButton(Button):
     def __init__(self, **kwargs):
@@ -100,10 +108,13 @@ class PlayingScreen(Screen):
         # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Button, etc
         # print("hi")
         self.id = "PlayScreen"
-        self.add_widget(BigGrid(board_size, app.boardData.GetBoardData()))
+        self.boardGrid = BigGrid(board_size, app.boardData.GetBoardData())
+        
+        self.add_widget(self.boardGrid)
         self.add_widget(Scoreboard())
         self.add_widget(MenuButton())
         self.add_widget(BallPicker())
+
 
 class GameApp(App):
     def __init__(self,**kwargs):
@@ -124,20 +135,33 @@ class GameApp(App):
         print(app.ballColor)
 
     def BoardPlace(self,instance):
+        
         if app.ballColor != 0:
-            instance.background_normal = app.BallPressedColor
-            instance.background_down = app.BallPressedDown
+            #instance.background_normal = app.BallPressedColor
+            #instance.background_down = app.BallPressedDown
+            location = BoardLogic.determineColRow((),instance.id,board_size)
+            print("\n~~~~~~~~\n")
+            print(location[0], location[1], int(app.BallPressedColor[9]))
+
+            
+            self.boardData.putBallInSpot(location[0], location[1], int(app.BallPressedColor[9]))
+           
+            self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
             print(instance.id)
             print(BoardLogic.determineColRow((),instance.id,board_size))
             app.ballColor = 0
         else:
+            # show some error message to user
             pass
+
+            
     # def RemovePickBall(self,instance):
     #     print(app.ball)
     #     self.root.remove_widget(self.root.ids[app.ball])
 
     def build(self):
-        return PlayingScreen()
+        self.screen = PlayingScreen()
+        return self.screen
 
 
 app = GameApp()
