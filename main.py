@@ -125,6 +125,7 @@ class GameApp(App):
         self.score = 0
         self.ballColor = 0
         self.placing = False
+        self.ballsPlaced = 0
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
@@ -150,12 +151,16 @@ class GameApp(App):
             print(instance.id)
             print(BoardLogic.determineColRow((),instance.id,board_size))
             app.ballColor = 0
+            app.ballsPlaced += 1
+            if app.ballsPlaced == 3:
+                self.boardData.ComputerBalls()
+                self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
+                app.ballsPlaced = 0
         else:
             # popup = Popup(title='Error',
             #     content=Button(text='No ball selected!'),
             #     size_hint=(None, None), size=(300, 200))
             # popup.open()
-            print(instance.id)
             # show some error message to user
             pass
 

@@ -1,10 +1,10 @@
-
+from random import randint
 
 class BoardLogic:
     def __init__(self, size):
         # the core data is an array to save the ball status on the board
         # initially, it is all empty, with all values set to 0
-        # the length of the array is size * size, as the 
+        # the length of the array is size * size, as the
         board = []
         for i in range(size):
             line = []
@@ -14,6 +14,7 @@ class BoardLogic:
 
         # here we have an initialized all-zero board data 
         self.boardData = board
+        self.size = size
 
 
     # this function is the response to the action that the player put a ball in a given location
@@ -58,6 +59,17 @@ class BoardLogic:
         column = number % dimension
         row = int((number-column)/dimension)
         return[row,column]
+
+    def ComputerBalls(self):
+        ballsAdded = 0
+        while ballsAdded < 3:
+            col = randint(0, self.size - 1)
+            row = randint(0, self.size - 1)
+            if self.boardData[col][row] == 0:
+                color = randint(2,9)
+                self.boardData[col][row] = color
+                ballsAdded += 1
+
 
         
 
