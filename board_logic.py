@@ -15,6 +15,7 @@ class BoardLogic:
         # here we have an initialized all-zero board data 
         self.boardData = board
         self.size = size
+        self.empty = []
 
 
     # this function is the response to the action that the player put a ball in a given location
@@ -46,7 +47,9 @@ class BoardLogic:
 
     # this function check whether the board is in a game-over state
     def IsGameOver(self):
-        pass
+        if len(self.empty) == 0:
+            return True
+        return False
 
     # this function detects if there are any lines, vertical/horizontal/diagonal, containing 5 or more same-value elements.
 
@@ -58,20 +61,28 @@ class BoardLogic:
     def determineColRow(self,number,dimension):
         column = number % dimension
         row = int((number-column)/dimension)
+        # row returns position in the row (for example, row = 2 would be the second element in a row)
+        # colum returns position in the column (for example, column = 1 would be the first element in a column)
         return[row,column]
 
     def ComputerBalls(self):
-        ballsAdded = 0
-        while ballsAdded < 3:
-            col = randint(0, self.size - 1)
-            row = randint(0, self.size - 1)
-            if self.boardData[col][row] == 0:
-                color = randint(2,9)
-                self.boardData[col][row] = color
-                ballsAdded += 1
+        # ballsAdded = 0
+        # while ballsAdded < 3:
+        #     col = randint(0, self.size - 1)
+        #     row = randint(0, self.size - 1)
+        #     if self.boardData[col][row] == 0:
+        #         color = randint(2,9)
+        #         self.boardData[col][row] = color
+        #         ballsAdded += 1
+        boxes = min(3, len(self.empty))
+        for i in range(boxes):
+            box = randint(0,len(self.empty)-1)
+            color = randint(2,9)
+            self.boardData[self.empty[box][0]][self.empty[box][1]] = color
+            self.empty.remove(self.empty[box])
 
-
-        
-
-
-
+    def FindEmpty(self, board):
+        for col in range(self.size):
+            for row in range(self.size):
+                if self.boardData[col][row] == 0:
+                    self.empty.append((col,row))

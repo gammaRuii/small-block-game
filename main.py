@@ -44,7 +44,7 @@ class BigGrid(GridLayout):
             for j in range(size):
                 color = TwoDArray[i][j]
                 # for each and every button below, we need to find a way to let it send back the column & row number
-                if color < 3 or color > 10 :
+                if color < 2 or color > 9 :
                     b = Button(on_release = app.BoardPlace)
                     b.id = i*board_size + j
                     # b.bind(on_release = app.RemovePickBall)
@@ -153,8 +153,10 @@ class GameApp(App):
             app.ballColor = 0
             app.ballsPlaced += 1
             if app.ballsPlaced == 3:
+                self.boardData.FindEmpty(self.boardData)
                 self.boardData.ComputerBalls()
                 self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
+
                 app.ballsPlaced = 0
         else:
             # popup = Popup(title='Error',
