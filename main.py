@@ -79,16 +79,18 @@ class Scoreboard(BoxLayout):
 # display three balls for player to place
 # once selected and placed, the correspong spot will be disabled. 
 class BallPicker(BoxLayout):
-    def __init__(self, **kwargs):
+    def __init__(self, colors, **kwargs):
         super().__init__(**kwargs)
-        self.id = "Ballpicker"
         self.size_hint = (None, None)
         height = int(board_dimension / board_size)
         self.size = (dp(height*3), dp(height))
+        self.draw(colors)
+    def draw(self,colors):
+        self.clear_widgets()
+        app.boardData.RandomColors()
         for i in range(3):
-            ball_color = randint(2,9)
-            ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress, )
-            ball.id = "ballpick{}".format(i)
+            ball_color = colors[i]
+            ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
             self.add_widget(ball)
         
         self.pos_hint = {"top": 1, "right": 1}
@@ -113,7 +115,8 @@ class PlayingScreen(Screen):
         self.add_widget(self.boardGrid)
         self.add_widget(Scoreboard())
         self.add_widget(MenuButton())
-        self.add_widget(BallPicker())
+        self.balls = BallPicker(app.boardData.colors)
+        self.add_widget(self.balls)
 
 
 class GameApp(App):
@@ -126,6 +129,7 @@ class GameApp(App):
         self.ballColor = 0
         self.placing = False
         self.ballsPlaced = 0
+        self.boardData.FindEmpty()
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
@@ -141,28 +145,33 @@ class GameApp(App):
             #instance.background_normal = app.BallPressedColor
             #instance.background_down = app.BallPressedDown
             location = BoardLogic.determineColRow((),instance.id,board_size)
-            print("\n~~~~~~~~\n")
-            print(location[0], location[1], int(app.BallPressedColor[9]))
+            # print("\n~~~~~~~~\n")
+            # print(location[0], location[1], int(app.BallPressedColor[9]))
 
             
             self.boardData.putBallInSpot(location[0], location[1], int(app.BallPressedColor[9]))
-           
+            self.boardData.empty.remove((location[0],location[1]))
             self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
-            print(instance.id)
-            print(BoardLogic.determineColRow((),instance.id,board_size))
+            # print(instance.id)
+            # print(BoardLogic.determineColRow((),instance.id,board_size))
             app.ballColor = 0
             app.ballsPlaced += 1
-            if app.ballsPlaced == 3:
-                self.boardData.FindEmpty(self.boardData)
+            instance.disabled = True
+            instance.background_disabled_normal = app.BallPressedColor
+            if app.ballsPlaced == 3 or self.boardData.IsGameOver():
+                if self.boardData.IsGameOver():
+                    app.stop()
                 self.boardData.ComputerBalls()
                 self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
-
                 app.ballsPlaced = 0
+                app.boardData.ClearColors()
+                app.boardData.RandomColors()
+                self.screen.balls.draw(app.boardData.colors)
         else:
-            # popup = Popup(title='Error',
-            #     content=Button(text='No ball selected!'),
-            #     size_hint=(None, None), size=(300, 200))
-            # popup.open()
+            popup = Popup(title='Error',
+                content=Button(text='No ball selected!'),
+                size_hint=(None, None), size=(300, 200))
+            popup.open()
             # show some error message to user
             pass
 

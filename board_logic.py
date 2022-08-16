@@ -16,6 +16,7 @@ class BoardLogic:
         self.boardData = board
         self.size = size
         self.empty = []
+        self.colors = []
 
 
     # this function is the response to the action that the player put a ball in a given location
@@ -81,8 +82,16 @@ class BoardLogic:
             self.boardData[self.empty[box][0]][self.empty[box][1]] = color
             self.empty.remove(self.empty[box])
 
-    def FindEmpty(self, board):
+    def FindEmpty(self):
         for col in range(self.size):
             for row in range(self.size):
                 if self.boardData[col][row] == 0:
                     self.empty.append((col,row))
+
+    def RandomColors(self):
+        for i in range(3):
+            color = randint(2,9)
+            self.colors.append(color)
+
+    def ClearColors(self):
+        self.colors.clear()
