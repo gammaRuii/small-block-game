@@ -39,7 +39,7 @@ class BigGrid(GridLayout):
     # please make sure it can redraw 
     def draw(self, size, TwoDArray):
         self.clear_widgets()
-        print(size, TwoDArray )
+        # print(size, TwoDArray )
         for i in range(size):
             for j in range(size):
                 color = TwoDArray[i][j]
@@ -91,6 +91,7 @@ class BallPicker(BoxLayout):
         for i in range(3):
             ball_color = colors[i]
             ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
+            ball.id = "ballpick{}".format(i)
             self.add_widget(ball)
         
         self.pos_hint = {"top": 1, "right": 1}
@@ -135,9 +136,9 @@ class GameApp(App):
         app.BallPressedColor = instance.background_normal
         app.ballColor = instance.background_normal[9]
         app.BallPressedDown = instance.background_down
-        instance.disabled = True
-        instance.background_disabled_normal = instance.background_down
-        print(app.ballColor)
+        instance.background_normal = instance.background_down
+        self.ballPicked = instance
+        # print(app.ballColor)
 
     def BoardPlace(self,instance):
         
@@ -146,18 +147,26 @@ class GameApp(App):
             #instance.background_down = app.BallPressedDown
             location = BoardLogic.determineColRow((),instance.id,board_size)
             # print("\n~~~~~~~~\n")
-            # print(location[0], location[1], int(app.BallPressedColor[9]))
+            print(location[0], location[1], int(app.BallPressedColor[9]))
 
             
-            self.boardData.putBallInSpot(location[0], location[1], int(app.BallPressedColor[9]))
-            self.boardData.empty.remove((location[0],location[1]))
-            self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
+
             # print(instance.id)
             # print(BoardLogic.determineColRow((),instance.id,board_size))
             app.ballColor = 0
+            try:
+                self.boardData.empty.remove((location[0], location[1]))
+            except ValueError:
+                InvalidPlace = Popup(title = "Invalid placement! There is already a ball here.",
+                                     size_hint = (None,None), size = (300,200))
+                InvalidPlace.open()
+                self.ballPicked.background_normal = app.BallPressedColor
+                return
             app.ballsPlaced += 1
-            instance.disabled = True
-            instance.background_disabled_normal = app.BallPressedColor
+            self.boardData.putBallInSpot(location[0], location[1], int(app.BallPressedColor[9]))
+            self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
+            self.ballPicked.disabled = True
+            self.ballPicked.background_disabled_normal = app.BallPressedDown
             if app.ballsPlaced == 3 or self.boardData.IsGameOver():
                 if self.boardData.IsGameOver():
                     app.stop()
