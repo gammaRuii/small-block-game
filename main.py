@@ -16,7 +16,7 @@ from kivy.uix.screenmanager import Screen,ScreenManager
 from kivy.uix.popup import Popup
 
 Window.clearcolor = (.5,.5,.5,0.7)
-board_size = 7
+board_size = 10
 default_size = 10
 board_dimension = 800
 
@@ -60,13 +60,7 @@ class Scoreboard(BoxLayout):
         self.orientation = "vertical"
         self.size_hint = (0.3, 0.15)
         self.pos_hint = {"top": 0.8, "right": 0.8}
-        runScore = BoxLayout()
-        runScore.orientation = "vertical"
-        scoretext = Label(text = "Score:")
-        runScore.add_widget(scoretext)
-        actualScore = Label(text = "{}".format(app.score))
-        runScore.add_widget(actualScore)
-        self.add_widget(runScore)
+        self.add_widget(RunScore)
         highScore = BoxLayout()
         highScore.orientation = "vertical"
         highscoretext = Label(text="Highscore:")
@@ -75,6 +69,20 @@ class Scoreboard(BoxLayout):
         bestScore = Label(text="1".format())
         highScore.add_widget(bestScore)
         self.add_widget(highScore)
+
+class RunScore(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = "vertical"
+        self.size_hint = (0.3, 0.075)
+        self.pos_hint = {"top": 0.85, "right": 0.8}
+
+    def draw(self, score):
+        self.clear_widgets()
+        scoretext = Label(text="Score:")
+        actualScore = Label(text="{}".format(score))
+        self.add_widget(scoretext)
+        self.add_widget(actualScore)
 
 # display three balls for player to place
 # once selected and placed, the correspong spot will be disabled. 
@@ -114,7 +122,8 @@ class PlayingScreen(Screen):
         self.boardGrid = BigGrid(board_size, app.boardData.GetBoardData())
         
         self.add_widget(self.boardGrid)
-        self.add_widget(Scoreboard())
+        self.scoreboard = RunScore()
+        self.add_widget(self.scoreboard)
         self.add_widget(MenuButton())
         self.balls = BallPicker(app.boardData.colors)
         self.add_widget(self.balls)
@@ -126,7 +135,6 @@ class GameApp(App):
         self.boardData = BoardLogic(board_size)
         self.nextBallColor = 0
         self.nextBallLocation = [0, 0]
-        self.score = 0
         self.ballColor = 0
         self.placing = False
         self.ballsPlaced = 0
@@ -147,8 +155,7 @@ class GameApp(App):
             #instance.background_down = app.BallPressedDown
             location = BoardLogic.determineColRow((),instance.id,board_size)
             # print("\n~~~~~~~~\n")
-            print(location[0], location[1], int(app.BallPressedColor[9]))
-
+            # print(location[0], location[1], int(app.BallPressedColor[9]))
             
 
             # print(instance.id)
@@ -167,10 +174,16 @@ class GameApp(App):
             self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
             self.ballPicked.disabled = True
             self.ballPicked.background_disabled_normal = app.BallPressedDown
+            self.boardData.ClearConnectedLines()
+            print(self.boardData.score)
+            self.screen.scoreboard.draw(self.boardData.score)
             if app.ballsPlaced == 3 or self.boardData.IsGameOver():
                 if self.boardData.IsGameOver():
                     app.stop()
                 self.boardData.ComputerBalls()
+                self.boardData.ClearConnectedLines()
+                print(self.boardData.score)
+                self.screen.scoreboard.draw(self.boardData.score)
                 self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
                 app.ballsPlaced = 0
                 app.boardData.ClearColors()

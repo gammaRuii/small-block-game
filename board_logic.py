@@ -17,6 +17,8 @@ class BoardLogic:
         self.size = size
         self.empty = []
         self.colors = []
+        self.score = 0
+        self.connected = 0
 
 
     # this function is the response to the action that the player put a ball in a given location
@@ -57,7 +59,74 @@ class BoardLogic:
     ## Question: Do you think this function is a good design? Is it efficient for our use case?
     ## can u think of a better one?
     def ClearConnectedLines(self):
-        pass
+        for col in range(self.size):
+            for row in range(self.size-5):
+                # horizontal check
+                if self.boardData[col][row] == self.boardData[col][row+1] == self.boardData[col][row+2] == self.boardData[col][row+3] == self.boardData[col][row+4]:
+                    if self.boardData[col][row] != 0:
+                        print("\n 1 ")
+                        self.connected += 5
+                        try:
+                            for i in range(1, self.size-4):
+                                if self.boardData[col][row] == 0:
+                                    break
+                                self.connected += 1
+                                if self.boardData[col][row] != self.boardData[col][row+i]:
+                                    break
+                        except IndexError:
+                            pass
+        for col in range(self.size - 5):
+            for row in range(self.size):
+                # vertical check
+                if self.boardData[col][row] == self.boardData[col+1][row] == self.boardData[col+2][row] == self.boardData[col+3][row] == self.boardData[col+4][row]:
+                    if self.boardData[col][row] != 0:
+                        print("\n 2 ")
+                        self.connected += 5
+                        try:
+                            for i in range(1, self.size-4):
+                                if self.boardData[col][row] == 0:
+                                    break
+                                self.connected += 1
+                                if self.boardData[col][row] != self.boardData[col+i][row]:
+                                    break
+                        except IndexError:
+                            pass
+        for col in range(self.size - 5):
+            for row in range(self.size - 5):
+                # check diagonally, by the equation y = x
+                if self.boardData[col][row] == self.boardData[col+1][row+1] == self.boardData[col+2][row+2] == self.boardData[col+3][row+3] == self.boardData[col+4][row+4]:
+                    if self.boardData[col][row] != 0:
+                        print("\n 3")
+                        self.connected += 5
+                        try:
+                            for i in range(1, self.size-4):
+                                if self.boardData[col][row] == 0:
+                                    break
+                                self.connected += 1
+                                if self.boardData[col][row] != self.boardData[col+i][row]:
+                                    break
+                        except IndexError:
+                            pass
+        for col in range(self.size):
+            for row in range(self.size-5):
+                # check diagonally, by the equation y = x
+                if self.boardData[col][row] == self.boardData[col-1][row+1] == self.boardData[col-2][row+2] == self.boardData[col-3][row+3] == self.boardData[col-4][row+4]:
+                    if self.boardData[col][row] != 0:
+                        print("\n 4")
+                        self.connected += 5
+                        try:
+                            for i in range(1, self.size-4):
+                                if self.boardData[col][row] == 0:
+                                    break
+                                self.connected += 1
+                                if self.boardData[col][row] != self.boardData[col+i][row]:
+                                    break
+                        except IndexError:
+                            pass
+        self.score += self.connected
+        print("\n ~~~~~~~~~~~~~~~~ ", self.connected)
+        self.connected = 0
+
 
     def determineColRow(self,number,dimension):
         column = number % dimension
