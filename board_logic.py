@@ -164,3 +164,65 @@ class BoardLogic:
 
     def ClearColors(self):
         self.colors.clear()
+
+    def ChainFinder(self, list, number):
+        cont = 0
+        maxcont = 0
+        prev = list[0]
+        for i in list:
+            if i == number:
+                if i != prev:
+                    cont = 1
+                else:
+                    cont += 1
+                maxcont = max(maxcont, cont)
+            prev = i
+        return maxcont
+
+    def GenerateChainList(self, orientation, location):
+        # orientation should be passed in as:
+        # h - horizontal
+        # v - vertical
+        # d - diagonal in positive direction, y = x
+        # rd - reverse diagonal, y = -x
+        if orientation == "h":
+            return self.boardData[location[0]]
+        if orientation == "v":
+            column = []
+            for i in range(self.size):
+                column.append(self.boardData[i][location[1]])
+            return column
+        if orientation == "d":
+            diagStart = (location[0],location[1])
+            colors = []
+            # print(self.boardData)
+            # while diagStart[0] > 0 and diagStart[1] > 0:
+            side = min(diagStart[0],diagStart[1])
+            diagStart = (diagStart[0] - side,diagStart[1] - side)
+            # print("ball")
+            # print(diagStart)
+            colorloc = diagStart
+            for i in range(self.size - max(diagStart[0], diagStart[1])):
+                # print(colorloc)
+                # print(i)
+                # print(self.boardData[colorloc[0]][colorloc[1]])
+                colors.append(self.boardData[colorloc[0]][colorloc[1]])
+                colorloc = (colorloc[0] + 1, colorloc[1] + 1)
+            return colors
+        if orientation == "rd":
+            diagStart = (location[0], location[1])
+            colors = []
+            # print(diagStart)
+            side = min(diagStart[0], self.size - diagStart[1])
+            # while diagStart[0] > 0 and diagStart[1] < self.size:
+            diagStart = (diagStart[0] - side, diagStart[1] + side)
+            # print("ball")
+            # print(diagStart)
+            colorloc = diagStart
+            for i in range(max(diagStart[0], diagStart[1]) + 1):
+                # print(colorloc)
+                # print(i)
+                # print(self.boardData[colorloc[0]][colorloc[1]])
+                colors.append(self.boardData[colorloc[0]][colorloc[1]])
+                colorloc = (colorloc[0] + 1, colorloc[1] - 1)
+            return colors
