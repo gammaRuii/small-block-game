@@ -19,6 +19,8 @@ class BoardLogic:
         self.colors = []
         self.score = 0
         self.connected = 0
+        self.colorsAdded = []
+        self.connected_length = 5
 
 
     # this function is the response to the action that the player put a ball in a given location
@@ -59,74 +61,7 @@ class BoardLogic:
     ## Question: Do you think this function is a good design? Is it efficient for our use case?
     ## can u think of a better one?
     def ClearConnectedLines(self):
-        for col in range(self.size):
-            for row in range(self.size-5):
-                # horizontal check
-                if self.boardData[col][row] == self.boardData[col][row+1] == self.boardData[col][row+2] == self.boardData[col][row+3] == self.boardData[col][row+4]:
-                    if self.boardData[col][row] != 0:
-                        print("\n 1 ")
-                        self.connected += 5
-                        try:
-                            for i in range(1, self.size-4):
-                                if self.boardData[col][row] == 0:
-                                    break
-                                self.connected += 1
-                                if self.boardData[col][row] != self.boardData[col][row+i]:
-                                    break
-                        except IndexError:
-                            pass
-        for col in range(self.size - 5):
-            for row in range(self.size):
-                # vertical check
-                if self.boardData[col][row] == self.boardData[col+1][row] == self.boardData[col+2][row] == self.boardData[col+3][row] == self.boardData[col+4][row]:
-                    if self.boardData[col][row] != 0:
-                        print("\n 2 ")
-                        self.connected += 5
-                        try:
-                            for i in range(1, self.size-4):
-                                if self.boardData[col][row] == 0:
-                                    break
-                                self.connected += 1
-                                if self.boardData[col][row] != self.boardData[col+i][row]:
-                                    break
-                        except IndexError:
-                            pass
-        for col in range(self.size - 5):
-            for row in range(self.size - 5):
-                # check diagonally, by the equation y = x
-                if self.boardData[col][row] == self.boardData[col+1][row+1] == self.boardData[col+2][row+2] == self.boardData[col+3][row+3] == self.boardData[col+4][row+4]:
-                    if self.boardData[col][row] != 0:
-                        print("\n 3")
-                        self.connected += 5
-                        try:
-                            for i in range(1, self.size-4):
-                                if self.boardData[col][row] == 0:
-                                    break
-                                self.connected += 1
-                                if self.boardData[col][row] != self.boardData[col+i][row]:
-                                    break
-                        except IndexError:
-                            pass
-        for col in range(self.size):
-            for row in range(self.size-5):
-                # check diagonally, by the equation y = x
-                if self.boardData[col][row] == self.boardData[col-1][row+1] == self.boardData[col-2][row+2] == self.boardData[col-3][row+3] == self.boardData[col-4][row+4]:
-                    if self.boardData[col][row] != 0:
-                        print("\n 4")
-                        self.connected += 5
-                        try:
-                            for i in range(1, self.size-4):
-                                if self.boardData[col][row] == 0:
-                                    break
-                                self.connected += 1
-                                if self.boardData[col][row] != self.boardData[col+i][row]:
-                                    break
-                        except IndexError:
-                            pass
-        self.score += self.connected
-        print("\n ~~~~~~~~~~~~~~~~ ", self.connected)
-        self.connected = 0
-
+        pass
 
     def determineColRow(self,number,dimension):
         column = number % dimension
@@ -145,9 +80,11 @@ class BoardLogic:
         #         self.boardData[col][row] = color
         #         ballsAdded += 1
         boxes = min(3, len(self.empty))
+        self.colorsAdded = []
         for i in range(boxes):
             box = randint(0,len(self.empty)-1)
             color = randint(2,9)
+            self.colorsAdded.append(color)
             self.boardData[self.empty[box][0]][self.empty[box][1]] = color
             self.empty.remove(self.empty[box])
 
@@ -179,19 +116,19 @@ class BoardLogic:
             prev = i
         return maxcont
 
-    def GenerateChainList(self, orientation, location):
+    def GenerateChainList(self, orientation, location, ballColor):
         # orientation should be passed in as:
         # h - horizontal
         # v - vertical
         # d - diagonal in positive direction, y = x
         # rd - reverse diagonal, y = -x
         if orientation == "h":
-            return self.boardData[location[0]]
+            passedList =  self.boardData[location[0]].copy()
         if orientation == "v":
             column = []
             for i in range(self.size):
                 column.append(self.boardData[i][location[1]])
-            return column
+            passedList = column.copy()
         if orientation == "d":
             diagStart = (location[0],location[1])
             colors = []
@@ -208,7 +145,7 @@ class BoardLogic:
                 # print(self.boardData[colorloc[0]][colorloc[1]])
                 colors.append(self.boardData[colorloc[0]][colorloc[1]])
                 colorloc = (colorloc[0] + 1, colorloc[1] + 1)
-            return colors
+            passedList = colors.copy()
         if orientation == "rd":
             diagStart = (location[0], location[1])
             colors = []
@@ -225,4 +162,22 @@ class BoardLogic:
                 # print(self.boardData[colorloc[0]][colorloc[1]])
                 colors.append(self.boardData[colorloc[0]][colorloc[1]])
                 colorloc = (colorloc[0] + 1, colorloc[1] - 1)
-            return colors
+            passedList = colors.copy()
+        cont = 0
+        maxcont = 0
+        locations = []
+        prev = passedList[0]
+        for i in passedList:
+            if i == ballColor:
+                if i != prev:
+                    locations.append(passedList[i])
+                    cont = 1
+                else:
+                    locations.append(passedList[i])
+                    cont += 1
+                maxcont = max(maxcont, cont)
+            prev = i
+        if len(locations) >= self.connected_length:
+            self.connected += maxcont
+            return locations
+
