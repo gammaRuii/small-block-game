@@ -174,14 +174,13 @@ class GameApp(App):
             self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
             self.ballPicked.disabled = True
             self.ballPicked.background_disabled_normal = app.BallPressedDown
-            self.boardData.ClearConnectedLines()
+            self.boardData.clearLine(location, app.ballColor)
             # print(self.boardData.score)
             self.screen.scoreboard.draw(self.boardData.score)
             if app.ballsPlaced == 3 or self.boardData.IsGameOver():
                 if self.boardData.IsGameOver():
                     app.stop()
                 self.boardData.ComputerBalls()
-                self.boardData.ClearConnectedLines()
                 # print(self.boardData.score)
                 self.screen.scoreboard.draw(self.boardData.score)
                 self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())

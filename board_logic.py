@@ -19,8 +19,8 @@ class BoardLogic:
         self.colors = []
         self.score = 0
         self.connected = 0
-        self.colorsAdded = []
         self.connected_length = 5
+        self.orientations = ['h','v','d','rd']
 
 
     # this function is the response to the action that the player put a ball in a given location
@@ -60,8 +60,8 @@ class BoardLogic:
 
     ## Question: Do you think this function is a good design? Is it efficient for our use case?
     ## can u think of a better one?
-    def ClearConnectedLines(self):
-        pass
+    # def ClearConnectedLines(self):
+    #     pass
 
     def determineColRow(self,number,dimension):
         column = number % dimension
@@ -80,13 +80,12 @@ class BoardLogic:
         #         self.boardData[col][row] = color
         #         ballsAdded += 1
         boxes = min(3, len(self.empty))
-        self.colorsAdded = []
         for i in range(boxes):
             box = randint(0,len(self.empty)-1)
             color = randint(2,9)
-            self.colorsAdded.append(color)
             self.boardData[self.empty[box][0]][self.empty[box][1]] = color
             self.empty.remove(self.empty[box])
+            self.clearLine(box,color)
 
     def FindEmpty(self):
         for col in range(self.size):
@@ -102,32 +101,34 @@ class BoardLogic:
     def ClearColors(self):
         self.colors.clear()
 
-    def ChainFinder(self, list, number):
-        cont = 0
-        maxcont = 0
-        prev = list[0]
-        for i in list:
-            if i == number:
-                if i != prev:
-                    cont = 1
-                else:
-                    cont += 1
-                maxcont = max(maxcont, cont)
-            prev = i
-        return maxcont
+    # def ChainFinder(self, list, number):
+    #     cont = 0
+    #     maxcont = 0
+    #     prev = list[0]
+    #     for i in list:
+    #         if i == number:
+    #             if i != prev:
+    #                 cont = 1
+    #             else:
+    #                 cont += 1
+    #             maxcont = max(maxcont, cont)
+    #         prev = i
+    #     return maxcont
 
-    def GenerateChainList(self, orientation, location, ballColor):
+    def GenerateChainList(self, orientation, location):
         # orientation should be passed in as:
         # h - horizontal
         # v - vertical
         # d - diagonal in positive direction, y = x
         # rd - reverse diagonal, y = -x
+        passedList = []
         if orientation == "h":
-            passedList =  self.boardData[location[0]].copy()
+            for i in range(self.size):
+                passedList.append((location[0], i))
         if orientation == "v":
             column = []
             for i in range(self.size):
-                column.append(self.boardData[i][location[1]])
+                column.append((i, location[1]))
             passedList = column.copy()
         if orientation == "d":
             diagStart = (location[0],location[1])
@@ -143,7 +144,7 @@ class BoardLogic:
                 # print(colorloc)
                 # print(i)
                 # print(self.boardData[colorloc[0]][colorloc[1]])
-                colors.append(self.boardData[colorloc[0]][colorloc[1]])
+                colors.append(colorloc)
                 colorloc = (colorloc[0] + 1, colorloc[1] + 1)
             passedList = colors.copy()
         if orientation == "rd":
@@ -156,28 +157,77 @@ class BoardLogic:
             # print("ball")
             # print(diagStart)
             colorloc = diagStart
+            # print(colorloc)
             for i in range(max(diagStart[0], diagStart[1]) + 1):
                 # print(colorloc)
                 # print(i)
                 # print(self.boardData[colorloc[0]][colorloc[1]])
-                colors.append(self.boardData[colorloc[0]][colorloc[1]])
+                colors.append(colorloc)
+
                 colorloc = (colorloc[0] + 1, colorloc[1] - 1)
+                # print(colorloc)
             passedList = colors.copy()
+        return passedList
+
+    def FindChain(self, passedList, ballColor):
+        print("\n ~~~~~~~~~~~~~~~~~~~~~ \n")
+        # print(passedList)
+        # print(ballColor)
         cont = 0
         maxcont = 0
         locations = []
-        prev = passedList[0]
-        for i in passedList:
-            if i == ballColor:
-                if i != prev:
-                    locations.append(passedList[i])
+        prev = self.boardData[passedList[0][0]][passedList[0][1]]
+        start_point = 0
+        best_start_point = 0
+        print(passedList)
+        for i in range(len(passedList)):
+            curColor = self.boardData[passedList[i][0]][passedList[i][1]]
+            if curColor == ballColor:
+                if curColor != prev:
+                    # locations.append(passedList[i])
                     cont = 1
+                    start_point = i
                 else:
-                    locations.append(passedList[i])
                     cont += 1
-                maxcont = max(maxcont, cont)
-            prev = i
-        if len(locations) >= self.connected_length:
+
+                    # if cont == 2:
+                    #     locations.append(passedList[i-1])
+                    # locations.append(passedList[i])
+
+                if cont > maxcont:
+                    maxcont = cont
+                    best_start_point = start_point
+                #maxcont = max(maxcont, cont)
+                # print(passedList[i])
+            prev = curColor
+        #print(locations)
+        #if len(locations) >= self.connected_length:
+            #
+        print(maxcont)
+        if maxcont >= self.connected_length:
             self.connected += maxcont
-            return locations
+            print(self.connected)
+            return passedList[best_start_point:best_start_point + maxcont]
+            #return locations
+
+
+    def clearLine(self, location, ballColor):
+        allLocations = []
+        toBeRemoved = []
+        for i in self.orientations:
+            allLocations.append(self.GenerateChainList(i,location))
+            # print(i)
+            # print(allLocations)
+        for i in range(4):
+            # print(self.FindChain(allLocations[i], ballColor))
+            # print("\n --------------------------- \n")
+            removeChain = self.FindChain(allLocations[i], ballColor)
+            if removeChain != None:
+                toBeRemoved.append(removeChain)
+        for i in range(len(toBeRemoved)):
+            for j in range(len(toBeRemoved[i])):
+                # print(toBeRemoved)
+                self.putBallInSpot(toBeRemoved[i][j][0], toBeRemoved[i][j][1], 0)
+
+
 

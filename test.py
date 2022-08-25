@@ -55,14 +55,28 @@ class TestChainFinder(unittest.TestCase):
         # print(boardData.GetBoardData())
         # print(boardData.GenerateChainList("rd", (2, 2)))
         # print("\n ------------------- \n")
-        self.assertEqual(boardData.GenerateChainList("h", (1, 1)), [1, 2, 3, 4])
-        self.assertEqual(boardData.GenerateChainList("v", (2, 2)), [2, 3, 4, 5])
-        self.assertEqual(boardData.GenerateChainList("d", (1, 2)), [1,3,5])
-        self.assertEqual(boardData.GenerateChainList("d", (2, 2)), [0,2,4,6])
-        self.assertEqual(boardData.GenerateChainList("rd", (1, 1)), [2,2,2])
-        self.assertEqual(boardData.GenerateChainList("rd", (1, 2)), [3, 3, 3, 3])
-        self.assertEqual(boardData.GenerateChainList("d", (0, 0)), [0,2,4,6])
-        self.assertEqual(boardData.GenerateChainList("rd", (0,0)), [0])
+        self.assertEqual(boardData.GenerateChainList("h", (1, 1)), [(1,0),(1,1),(1,2),(1,3)])
+        self.assertEqual(boardData.GenerateChainList("v", (2, 2)), [(0,2), (1,2), (2,2), (3,2)])
+        self.assertEqual(boardData.GenerateChainList("d", (1, 2)), [(0,1),(1,2),(2,3)])
+        self.assertEqual(boardData.GenerateChainList("d", (2, 2)), [(0,0),(1,1),(2,2),(3,3)])
+        self.assertEqual(boardData.GenerateChainList("rd", (1, 1)), [(0,2),(1,1),(2,0)])
+        self.assertEqual(boardData.GenerateChainList("rd", (1, 2)), [(0,3), (1,2), (2,1),(3,0)])
+        self.assertEqual(boardData.GenerateChainList("d", (0, 0)), [(0,0),(1,1),(2,2),(3,3)])
+        self.assertEqual(boardData.GenerateChainList("rd", (0,0)), [(0,0)])
+
+    def test_clearLine(self):
+        size = 6
+        boardData = BoardLogic(size)
+        emptyGrid = BoardLogic(size)
+
+        for i in range(size):
+            boardData.putBallInSpot(0,i,1)
+        # print(boardData.GetBoardData())
+        boardData.clearLine((0,0),1)
+        # print(boardData.GetBoardData())
+        self.assertEqual(boardData.connected, 6)
+        self.assertEqual(boardData.GetBoardData(), emptyGrid.GetBoardData())
+
 
 if __name__ == '__main__':
     unittest.main()
