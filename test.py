@@ -77,6 +77,46 @@ class TestChainFinder(unittest.TestCase):
         self.assertEqual(boardData.connected, 6)
         self.assertEqual(boardData.GetBoardData(), emptyGrid.GetBoardData())
 
+        for i in range(size):
+            boardData.putBallInSpot(i,i,1)
+        boardData.clearLine((0,0),1)
+        self.assertEqual(boardData.GetBoardData(), emptyGrid.GetBoardData())
+        self.assertEqual(boardData.connected, 6)
+
+
+        for i in range(size):
+            boardData.putBallInSpot(size - i - 1, i , 1)
+        boardData.clearLine((5,0),1)
+        self.assertEqual(boardData.GetBoardData(), emptyGrid.GetBoardData())
+        self.assertEqual(boardData.connected, 6)
+
+
+        for i in range(size):
+            boardData.putBallInSpot(i,0,1)
+        boardData.clearLine((0,0),1)
+        self.assertEqual(boardData.GetBoardData(), emptyGrid.GetBoardData())
+        self.assertEqual(boardData.connected, 6)
+
+        for i in range(size):
+            boardData.putBallInSpot(i,0,1)
+        for i in range(size):
+            boardData.putBallInSpot(0,i,1)
+        boardData.clearLine((0,0),1)
+        self.assertEqual(boardData.GetBoardData(), emptyGrid.GetBoardData())
+        self.assertEqual(boardData.connected, 11)
+
+        for i in range(size):
+            boardData.putBallInSpot(i,2,1)
+        for i in range(size):
+            boardData.putBallInSpot(2,i,1)
+        for i in range(size):
+            boardData.putBallInSpot(i,i,1)
+        for i in range(5):
+            boardData.putBallInSpot(5-i-1, i, 1)
+        boardData.clearLine((2,2),1)
+        self.assertEqual(boardData.GetBoardData(), emptyGrid.GetBoardData())
+        self.assertEqual(boardData.connected, 20)
+
 
 if __name__ == '__main__':
     unittest.main()

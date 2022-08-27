@@ -85,7 +85,9 @@ class BoardLogic:
             color = randint(2,9)
             self.boardData[self.empty[box][0]][self.empty[box][1]] = color
             self.empty.remove(self.empty[box])
-            self.clearLine(box,color)
+            # print(box, "box")
+            # print(self.empty[box])
+            self.clearLine((self.empty[box][0], self.empty[box][1]), color)
 
     def FindEmpty(self):
         for col in range(self.size):
@@ -124,6 +126,9 @@ class BoardLogic:
         passedList = []
         if orientation == "h":
             for i in range(self.size):
+                # print("\n ****************************\n")
+                # print(location)
+                # print("infinite h fehmobe")
                 passedList.append((location[0], i))
         if orientation == "v":
             column = []
@@ -151,14 +156,14 @@ class BoardLogic:
             diagStart = (location[0], location[1])
             colors = []
             # print(diagStart)
-            side = min(diagStart[0], self.size - diagStart[1])
+            side = min(diagStart[0], self.size - diagStart[1] - 1)
             # while diagStart[0] > 0 and diagStart[1] < self.size:
             diagStart = (diagStart[0] - side, diagStart[1] + side)
             # print("ball")
             # print(diagStart)
             colorloc = diagStart
             # print(colorloc)
-            for i in range(max(diagStart[0], diagStart[1]) + 1):
+            for i in range(diagStart[0],diagStart[1]+1):
                 # print(colorloc)
                 # print(i)
                 # print(self.boardData[colorloc[0]][colorloc[1]])
@@ -170,16 +175,20 @@ class BoardLogic:
         return passedList
 
     def FindChain(self, passedList, ballColor):
-        print("\n ~~~~~~~~~~~~~~~~~~~~~ \n")
+        # print("\n ~~~~~~~~~~~~~~~~~~~~~ \n")
         # print(passedList)
         # print(ballColor)
         cont = 0
         maxcont = 0
-        locations = []
+        # print(passedList)
+        # print("\n        j           \n")
+        # print(self.boardData[passedList[0][0]][passedList[0][1]])
         prev = self.boardData[passedList[0][0]][passedList[0][1]]
+        # print(passedList[0])
+        # print(passedList)
         start_point = 0
         best_start_point = 0
-        print(passedList)
+
         for i in range(len(passedList)):
             curColor = self.boardData[passedList[i][0]][passedList[i][1]]
             if curColor == ballColor:
@@ -203,31 +212,55 @@ class BoardLogic:
         #print(locations)
         #if len(locations) >= self.connected_length:
             #
-        print(maxcont)
+        # print(maxcont)
         if maxcont >= self.connected_length:
+            if self.connected >= 5:
+                self.connected += maxcont - 1
+                return passedList[best_start_point:best_start_point + maxcont]
             self.connected += maxcont
-            print(self.connected)
+            # print(self.connected)
             return passedList[best_start_point:best_start_point + maxcont]
             #return locations
 
 
     def clearLine(self, location, ballColor):
+        print("\n ~~~~~~~~~~~~~~~~~~ \n")
+        self.connected = 0
         allLocations = []
         toBeRemoved = []
         for i in self.orientations:
-            allLocations.append(self.GenerateChainList(i,location))
+            chainList = self.GenerateChainList(i, location)
+            print(location)
+            print(i)
+            print(chainList)
+            allLocations.append(chainList)
+            print(allLocations)
             # print(i)
             # print(allLocations)
         for i in range(4):
             # print(self.FindChain(allLocations[i], ballColor))
             # print("\n --------------------------- \n")
+            # print(allLocations)
+            print("\ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ \n")
+
             removeChain = self.FindChain(allLocations[i], ballColor)
+            print(allLocations[i])
+            print(ballColor)
+            print(removeChain)
+
             if removeChain != None:
                 toBeRemoved.append(removeChain)
+
+        print("\n ===================================== \n")
+        print(toBeRemoved)
+
         for i in range(len(toBeRemoved)):
             for j in range(len(toBeRemoved[i])):
                 # print(toBeRemoved)
                 self.putBallInSpot(toBeRemoved[i][j][0], toBeRemoved[i][j][1], 0)
+                self.empty.append(toBeRemoved[i][j])
+        self.score += self.connected
+
 
 
 

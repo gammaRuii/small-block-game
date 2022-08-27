@@ -142,7 +142,7 @@ class GameApp(App):
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
-        app.ballColor = instance.background_normal[9]
+        app.ballColor = int(instance.background_normal[9])
         app.BallPressedDown = instance.background_down
         instance.background_normal = instance.background_down
         self.ballPicked = instance
@@ -160,7 +160,7 @@ class GameApp(App):
 
             # print(instance.id)
             # print(BoardLogic.determineColRow((),instance.id,board_size))
-            app.ballColor = 0
+
             try:
                 self.boardData.empty.remove((location[0], location[1]))
             except ValueError:
@@ -170,13 +170,19 @@ class GameApp(App):
                 self.ballPicked.background_normal = app.BallPressedColor
                 return
             app.ballsPlaced += 1
-            self.boardData.putBallInSpot(location[0], location[1], int(app.BallPressedColor[9]))
+            self.boardData.putBallInSpot(location[0], location[1], app.ballColor)
             self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
             self.ballPicked.disabled = True
             self.ballPicked.background_disabled_normal = app.BallPressedDown
+            print("\n AAAAAAAAAAAAAAAAAAAAAAAAA \n")
+            print(app.ballColor)
+
             self.boardData.clearLine(location, app.ballColor)
             # print(self.boardData.score)
+            self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
+            print(self.boardData.GetBoardData())
             self.screen.scoreboard.draw(self.boardData.score)
+            app.ballColor = 0
             if app.ballsPlaced == 3 or self.boardData.IsGameOver():
                 if self.boardData.IsGameOver():
                     app.stop()
