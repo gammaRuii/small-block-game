@@ -117,7 +117,6 @@ class PlayingScreen(Screen):
         super().__init__(**kwargs)
 
         # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Button, etc
-        # print("hi")
         self.id = "PlayScreen"
         self.boardGrid = BigGrid(board_size, app.boardData.GetBoardData())
         
@@ -146,7 +145,6 @@ class GameApp(App):
         app.BallPressedDown = instance.background_down
         instance.background_normal = instance.background_down
         self.ballPicked = instance
-        # print(app.ballColor)
 
     def BoardPlace(self,instance):
         
@@ -174,20 +172,14 @@ class GameApp(App):
             self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
             self.ballPicked.disabled = True
             self.ballPicked.background_disabled_normal = app.BallPressedDown
-            print("\n AAAAAAAAAAAAAAAAAAAAAAAAA \n")
-            print(app.ballColor)
-
             self.boardData.clearLine(location, app.ballColor)
-            # print(self.boardData.score)
             self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
-            print(self.boardData.GetBoardData())
             self.screen.scoreboard.draw(self.boardData.score)
             app.ballColor = 0
             if app.ballsPlaced == 3 or self.boardData.IsGameOver():
                 if self.boardData.IsGameOver():
                     app.stop()
                 self.boardData.ComputerBalls()
-                # print(self.boardData.score)
                 self.screen.scoreboard.draw(self.boardData.score)
                 self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
                 app.ballsPlaced = 0
