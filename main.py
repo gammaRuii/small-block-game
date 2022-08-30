@@ -27,7 +27,6 @@ class BigGrid(GridLayout):
     def __init__(self, size, TwoDArray, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (None,None)
-        self.size = (dp(board_dimension ),dp(board_dimension))
         if size <= 0:
             size = default_size
         self.cols = size
@@ -45,11 +44,11 @@ class BigGrid(GridLayout):
                 color = TwoDArray[i][j]
                 # for each and every button below, we need to find a way to let it send back the column & row number
                 if color < 2 or color > 9 :
-                    b = Button(on_release = app.BoardPlace)
+                    b = Button(size_hint = (None,None), size = (dp(30),dp(30)), on_release = app.BoardPlace)
                     b.id = i*board_size + j
                     # b.bind(on_release = app.RemovePickBall)
                 else :
-                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), on_release = app.BoardPlace)
+                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), size_hint = (None,None), size = (dp(30),dp(30)), on_release = app.BoardPlace)
                     b.id = i * board_size + j
                 self.add_widget(b)
 
@@ -85,7 +84,7 @@ class RunScore(BoxLayout):
         self.add_widget(actualScore)
 
 # display three balls for player to place
-# once selected and placed, the correspong spot will be disabled. 
+# once selected and placed, the correspong spot will be disabled.
 class BallPicker(BoxLayout):
     def __init__(self, colors, **kwargs):
         super().__init__(**kwargs)
@@ -128,7 +127,7 @@ class PlayingScreen(Screen):
         self.add_widget(self.balls)
 
 
-class GameApp(App):
+class GridGameApp(App):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.boardData = BoardLogic(board_size)
@@ -204,7 +203,7 @@ class GameApp(App):
         return self.screen
 
 
-app = GameApp()
+app = GridGameApp()
 
 app.run()
 
