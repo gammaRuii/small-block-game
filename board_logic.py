@@ -67,12 +67,10 @@ class BoardLogic:
         boxes = min(3, len(self.empty))
         for i in range(boxes):
             box = randint(0,len(self.empty)-1)
-            color = randint(2,9)
+            color = randint(1,6)
             self.boardData[self.empty[box][0]][self.empty[box][1]] = color
-            self.empty.remove(self.empty[box])
-            # print(box, "box")
-            # print(self.empty[box])
             self.clearLine((self.empty[box][0], self.empty[box][1]), color)
+            self.empty.remove(self.empty[box])
 
     def FindEmpty(self):
         for col in range(self.size):
@@ -82,7 +80,7 @@ class BoardLogic:
 
     def RandomColors(self):
         for i in range(3):
-            color = randint(2,9)
+            color = randint(1,6)
             self.colors.append(color)
 
     def ClearColors(self):
@@ -152,7 +150,6 @@ class BoardLogic:
 
 
     def clearLine(self, location, ballColor):
-        print("\n ~~~~~~~~~~~~~~~~~~ \n")
         self.connected = 0
         allLocations = []
         toBeRemoved = []

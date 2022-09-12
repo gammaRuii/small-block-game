@@ -19,6 +19,7 @@ Window.clearcolor = (.5,.5,.5,0.7)
 board_size = 10
 default_size = 10
 board_dimension = 800
+button_size = 100
 
 ### please think what behavior each widget should have? What callbacks needs to be defined?
 ### and what data will be updated in each callback?
@@ -26,11 +27,11 @@ board_dimension = 800
 class BigGrid(GridLayout):
     def __init__(self, size, TwoDArray, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint = (None,None)
+        self.size_hint = (0.3,1)
         if size <= 0:
             size = default_size
         self.cols = size
-
+        # self.pos_hint = {"x":0, "y":0.3}
         self.draw(size, TwoDArray)
 
 
@@ -43,12 +44,12 @@ class BigGrid(GridLayout):
             for j in range(size):
                 color = TwoDArray[i][j]
                 # for each and every button below, we need to find a way to let it send back the column & row number
-                if color < 2 or color > 9 :
-                    b = Button(size_hint = (None,None), size = (dp(30),dp(30)), on_release = app.BoardPlace)
+                if color < 1 or color > 6 :
+                    b = Button(size_hint = (None,None), size = (dp(button_size),dp(button_size)), on_release = app.BoardPlace)
                     b.id = i*board_size + j
                     # b.bind(on_release = app.RemovePickBall)
                 else :
-                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), size_hint = (None,None), size = (dp(30),dp(30)), on_release = app.BoardPlace)
+                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), size_hint = (None,None), size = (dp(button_size),dp(button_size)), on_release = app.BoardPlace)
                     b.id = i * board_size + j
                 self.add_widget(b)
 
@@ -140,9 +141,19 @@ class GridGameApp(App):
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
-        app.ballColor = int(instance.background_normal[9])
         app.BallPressedDown = instance.background_down
-        instance.background_normal = instance.background_down
+        try:
+            app.ballColor = int(instance.background_normal[9])
+            app.revertNormal = "snapshot0{}.png".format(app.ballColor)
+            app.revertDown = "snap0{}d.png".format(app.ballColor)
+            instance.background_normal = instance.background_down
+        except ValueError:
+            instance.background_normal = app.revertNormal
+            instance.background_down = app.revertDown
+            app.BallPressedColor = None
+            app.ballColor = None
+            app.BallPressedDown = None
+
         self.ballPicked = instance
 
     def BoardPlace(self,instance):
