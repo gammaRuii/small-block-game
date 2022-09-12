@@ -151,7 +151,7 @@ class GridGameApp(App):
             instance.background_normal = app.revertNormal
             instance.background_down = app.revertDown
             app.BallPressedColor = None
-            app.ballColor = None
+            app.ballColor = 0
             app.BallPressedDown = None
 
         self.ballPicked = instance
