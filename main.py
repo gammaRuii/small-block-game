@@ -19,19 +19,22 @@ Window.clearcolor = (.5,.5,.5,0.7)
 board_size = 10
 default_size = 10
 board_dimension = 800
-button_size = 100
+
+
+
 
 ### please think what behavior each widget should have? What callbacks needs to be defined?
 ### and what data will be updated in each callback?
 
+
+
 class BigGrid(GridLayout):
     def __init__(self, size, TwoDArray, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint = (0.3,1)
         if size <= 0:
             size = default_size
         self.cols = size
-        # self.pos_hint = {"x":0, "y":0.3}
+        self.pos_hint = {"top":0.85, "left":0}
         self.draw(size, TwoDArray)
 
 
@@ -45,11 +48,11 @@ class BigGrid(GridLayout):
                 color = TwoDArray[i][j]
                 # for each and every button below, we need to find a way to let it send back the column & row number
                 if color < 1 or color > 6 :
-                    b = Button(size_hint = (None,None), size = (dp(button_size),dp(button_size)), on_release = app.BoardPlace)
+                    b = Button(size_hint = (None, None), size = (app.button_size,app.button_size), on_release = app.BoardPlace)
                     b.id = i*board_size + j
                     # b.bind(on_release = app.RemovePickBall)
                 else :
-                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), size_hint = (None,None), size = (dp(button_size),dp(button_size)), on_release = app.BoardPlace)
+                    b = Button(background_normal = 'snapshot0{}.png'.format(color), background_down = 'snap0{}d.png'.format(color), size_hint = (None,None), size = (app.button_size,app.button_size), on_release = app.BoardPlace)
                     b.id = i * board_size + j
                 self.add_widget(b)
 
@@ -138,6 +141,7 @@ class GridGameApp(App):
         self.placing = False
         self.ballsPlaced = 0
         self.boardData.FindEmpty()
+        self.button_size = Window.size[1] / 10
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
