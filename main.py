@@ -35,8 +35,15 @@ class BigGrid(GridLayout):
             size = default_size
         self.cols = size
         self.pos_hint = {"top":0.85, "left":0}
+        #self.pos_hint = {"top": 1, "left": 0}
+        Window.bind(on_resize=self.on_window_resize)
         self.draw(size, TwoDArray)
 
+    def on_window_resize(self, window, width, height):
+        app.button_size = width / 10
+        print("\n ~~~~~~~~~~~~~ \n")
+        print(app.button_size)
+        self.draw(self.cols, app.boardData.GetBoardData())
 
     # we need to call the function every time the board status (a new ball placed, or a new game started)
     # please make sure it can redraw 
@@ -104,7 +111,7 @@ class BallPicker(BoxLayout):
             ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
             ball.id = "ballpick{}".format(i)
             self.add_widget(ball)
-        
+
         self.pos_hint = {"top": 1, "right": 1}
 # once clicked, the game will be reset, a new game starts
 class MenuButton(Button):
@@ -122,7 +129,7 @@ class PlayingScreen(Screen):
         # we need to return a screen with the board of grids, next-round ball picker, scoreboard, "Start" Button, etc
         self.id = "PlayScreen"
         self.boardGrid = BigGrid(board_size, app.boardData.GetBoardData())
-        
+
         self.add_widget(self.boardGrid)
         self.scoreboard = RunScore()
         self.add_widget(self.scoreboard)
@@ -141,7 +148,7 @@ class GridGameApp(App):
         self.placing = False
         self.ballsPlaced = 0
         self.boardData.FindEmpty()
-        self.button_size = Window.size[1] / 10
+        self.button_size = Window.size[0] / 10
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
