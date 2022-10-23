@@ -85,7 +85,7 @@ class RunScore(BoxLayout):
         super().__init__(**kwargs)
         self.orientation = "vertical"
         self.size_hint = (0.3, 0.075)
-        self.pos_hint = {"top": 0.85, "right": 0.8}
+        self.pos_hint = {"top": 0.9, "center_x": 0.8}
 
     def draw(self, score):
         self.clear_widgets()
@@ -103,6 +103,7 @@ class BallPicker(BoxLayout):
         height = int(board_dimension / board_size)
         self.size = (dp(height*3), dp(height))
         self.draw(colors)
+        self.pos_hint = {"top": 0.2, "center_x": 0.5}
     def draw(self,colors):
         self.clear_widgets()
         app.boardData.RandomColors()
@@ -111,8 +112,6 @@ class BallPicker(BoxLayout):
             ball = Button(background_normal = "snapshot0{}.png".format(ball_color), background_down = "snap0{}d.png".format(ball_color), on_release = app.PickerPress)
             ball.id = "ballpick{}".format(i)
             self.add_widget(ball)
-
-        self.pos_hint = {"top": 1, "right": 1}
 # once clicked, the game will be reset, a new game starts
 class MenuButton(Button):
     def __init__(self, **kwargs):
@@ -149,6 +148,7 @@ class GridGameApp(App):
         self.ballsPlaced = 0
         self.boardData.FindEmpty()
         self.button_size = Window.size[0] / 10
+        self.scoreboard.draw(self.boardData.score)
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
