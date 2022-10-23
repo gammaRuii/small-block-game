@@ -148,7 +148,6 @@ class GridGameApp(App):
         self.ballsPlaced = 0
         self.boardData.FindEmpty()
         self.button_size = Window.size[0] / 10
-        self.scoreboard.draw(self.boardData.score)
 
     def PickerPress(self,instance):
         app.BallPressedColor = instance.background_normal
