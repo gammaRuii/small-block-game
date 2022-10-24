@@ -85,7 +85,7 @@ class RunScore(BoxLayout):
         super().__init__(**kwargs)
         self.orientation = "vertical"
         self.size_hint = (0.3, 0.075)
-        self.pos_hint = {"top": 0.9, "center_x": 0.8}
+        self.pos_hint = {"top": 0.95, "center_x": 0.5}
 
     def draw(self, score):
         self.clear_widgets()
