@@ -14,11 +14,12 @@ from kivy.uix.screenmanager import Screen,ScreenManager
 #from kivymd.uix.menu import MDDropdownMenu
 #from kivymd.uix.behaviors.backgroundcolor_behavior import BackgroundColorBehavior
 from kivy.uix.popup import Popup
+import json
 
 Window.clearcolor = (.5,.5,.5,0.7)
-board_size = 10
+board_size = 6
 default_size = 10
-board_dimension = 800
+board_dimension = 1000
 
 
 
@@ -70,15 +71,13 @@ class Scoreboard(BoxLayout):
         self.orientation = "vertical"
         self.size_hint = (0.3, 0.15)
         self.pos_hint = {"top": 0.8, "right": 0.8}
-        self.add_widget(RunScore)
+        with open("high_score.json") as hs:
+            highsc = json.load(hs)
+            high = highsc["highscore"]
         highScore = BoxLayout()
         highScore.orientation = "vertical"
-        highscoretext = Label(text="Highscore:")
-        highScore.add_widget(highscoretext)
-        # add high score to format when json/yml file is written
-        bestScore = Label(text="1".format())
-        highScore.add_widget(bestScore)
-        self.add_widget(highScore)
+        highscoretext = Label(text="Highscore:\n{}".format(high))
+        self.add_widget(highscoretext)
 
 class RunScore(BoxLayout):
     def __init__(self, **kwargs):
@@ -101,9 +100,9 @@ class BallPicker(BoxLayout):
         super().__init__(**kwargs)
         self.size_hint = (None, None)
         height = int(board_dimension / board_size)
-        self.size = (dp(height*3), dp(height))
+        self.size = (dp(height*3/2), dp(height/2))
         self.draw(colors)
-        self.pos_hint = {"top": 0.2, "center_x": 0.5}
+        self.pos_hint = {"top": 1., "center_x": 0.7}
     def draw(self,colors):
         self.clear_widgets()
         app.boardData.RandomColors()
@@ -135,6 +134,8 @@ class PlayingScreen(Screen):
         self.add_widget(MenuButton())
         self.balls = BallPicker(app.boardData.colors)
         self.add_widget(self.balls)
+        self.highscore = Scoreboard()
+        self.add_widget(self.highscore)
 
 
 class GridGameApp(App):
@@ -198,8 +199,28 @@ class GridGameApp(App):
             app.ballColor = 0
             if app.ballsPlaced == 3 or self.boardData.IsGameOver():
                 if self.boardData.IsGameOver():
+                    with open("high_score.json", "r") as hs:
+                        highscore = json.load(hs)
+                        high = highscore["highscore"]
+                        if self.boardData.score > high:
+                            high = self.boardData.score
+                            with open("high_score.json", "w") as hs:
+                                print('j')
+                                json.dump(high, hs, indent=4)
+
+
                     app.stop()
                 self.boardData.ComputerBalls()
+                if self.boardData.IsGameOver():
+                    with open("high_score.json", "r") as hs:
+                        highscore = json.load(hs)
+                        high = highscore["highscore"]
+                        if self.boardData.score > high:
+                            high = self.boardData.score
+                            with open("high_score.json", "w") as hs:
+                                print('j')
+                                json.dump(high, hs, indent=4)
+                    app.stop()
                 self.screen.scoreboard.draw(self.boardData.score)
                 self.screen.boardGrid.draw(board_size, self.boardData.GetBoardData())
                 app.ballsPlaced = 0

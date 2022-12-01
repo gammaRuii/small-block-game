@@ -77,6 +77,7 @@ class BoardLogic:
             for row in range(self.size):
                 if self.boardData[col][row] == 0:
                     self.empty.append((col,row))
+                    print(self.empty)
 
     def RandomColors(self):
         for i in range(3):
